@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="http://code.highcharts.com/stock/highstock.js"></script>
+        <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
+    </head>
+    <body>
+        <div id="con"></div>
+        <script>
+            const con = document.querySelector('#con');
+
+            function initialize(){
+                let param = location.search.split("?");
+                console.log(param);
+                fetch(`/database_map?${param[1]}`,{}).then(
+                    res => res.json()
+                ).then((data) => {
+                console.log(data);
+                con.innerHTML = '';
+                let val = [];       // 光敏電阻值
+                let stime = [];     // 存放 sample time
+                let address = [];
+
+                data.forEach(e => {
+                    val.push(parseInt(e.value));
+                    stime.push(e.time);
+                    address.push(e.address);
+                });
+
+                Highcharts.chart('con', {
+                    title: {
+                        text: '光度變化'
+                    }, subtitle:{
+                        text: address[0]
+                    }, scrollbar:{
+                        enabled: true
+                    }, charts:{
+                        type: 'spline',
+                        zoomType: 'x'
+                    }, xAxis:{
+                        tickInterval: 1,
+                        labels:{
+                            enabled: true,
+                            formatter: function(){
+                                return stime[this.x];
+                            }
+                        }
+                    }, yAxis:{
+                        title:{
+                            text: 'light value'
+                        }
+                    }, series:[{
+                        name: 'light',
+                        data: val
+                    }], tooltip:{
+                        formatter: function(){
+                            return `<b>${stime[this.x]}</b><br><li>${this.series.name}: <b>${this.y}</b></li>`;
+                        }
+                    }, plotOptions:{
+                        spline: {
+                            lineWidth: 3,
+                            states:{
+                                hover:{
+                                    lineWidth: 5
+                                }
+                            }, 
+                            marker: {
+                                enabled: true
+                            }
+                        }
+                    }
+                });
+            }).catch(e =>{
+                    console.log(e);
+                });
+            }
+
+            window.onload = initialize;
+        </script>
+    </body>
+</html>
