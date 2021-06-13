@@ -5,10 +5,10 @@ import os
 app = flask.Flask(__name__)
 
 config = {
-    'host': 'localhost',
-    'user': 'test123',
-    'pwd': 'test123',
-    'db': 'lightdb'
+    'host': os.environ.get('CLEARDB_DATABASE_HOST', 'localhost'),
+    'user': os.environ.get('CLEARDB_DATABASE_USER', 'test123'),
+    'pwd': os.environ.get('CLEARDB_DATABASE_PWD', 'test123'),
+    'db': os.environ.get('CLEARDB_DATABASE_DB', 'lightdb')
 }
 
 def pymsqlConnect():
